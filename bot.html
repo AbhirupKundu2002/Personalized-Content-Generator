@@ -197,6 +197,9 @@
 		   showBotMessage('Hello there! ');
 		   showBotMessage('Allow me to introduce myself, I am an imitation chatbot that speaks just like your favorite public personality.Who would you like me to imitate? Type the name of a public personality ')
 	   });</script>
+	<py-config>
+		packages = ["numpy", "pandas"]
+	  </py-config>
 	<py-script>
 	import asyncio
 	import js
@@ -205,6 +208,10 @@
 	from js import document, window, Uint8Array
 	from pyodide.ffi.wrappers import add_event_listener
 	import csv
+	import pandas as pd
+	import tracemalloc
+	tracemalloc.start()
+		
 	async def get_bytes_from_file(file):
 		array_buf = await file.arrayBuffer()
 		return array_buf.to_bytes()
