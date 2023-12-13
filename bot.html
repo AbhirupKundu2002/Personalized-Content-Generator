@@ -1,0 +1,253 @@
+<html>
+
+<head>
+
+	<!-- seo related -->
+	<title>Personalized ChatBot</title>
+
+	<!-- meta related -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+	<!-- vendor css & style files -->
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Josefin+Sans:300|Open+Sans:300|Oxygen|Material+Icons"
+		rel="stylesheet">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+	<!-- custom css -->
+	<link rel="stylesheet" type="text/css" href="static/main.css">
+	<link rel="stylesheet" href="https://pyscript.net/releases/2023.11.1/core.css" />
+<script type="module" src="https://pyscript.net/releases/2023.11.1/core.js"></script>
+</head>
+
+<body>
+
+	<div class="container">
+
+		<div class="row padded_row">
+
+			<!-- right side content -->
+			<div class="col-md-7">
+
+				<div class="chat_window">
+
+					<div class="top_menu">
+						<div class="title">Personalized-ChatBot</div>
+					</div>
+
+					<!-- dynamically rendered -->
+					<ul class="messages"></ul>
+
+					<!-- input -->
+					<div class="bottom_wrapper">
+						<input id="msg_input" placeholder="Say Hi to begin chat..." />
+						<div id="send_button" class="app_button_1">Send</div>
+					</div>
+
+				</div>
+
+			</div>
+
+			<!-- left side content -->
+			<div class="col-md-5">
+				<div class="chat_window">
+
+					<div class="top_menu">
+						<div class="title">Document Upload</div>
+					</div>
+					<p align="center"><b>Upload a text File</b></p>
+            <ol>
+              <div>
+                <label for="upload">File Upload:</label>
+                <input type="file" name="upload" id="upload">
+              </div>
+            </ol>
+			<p id="content"></p>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+	<!-- vendor script files -->
+	<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js">
+	</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js" integrity="sha512-ml/QKfG3+Yes6TwOzQb7aCNtJF4PUyha6R3w8pSTo/VJSywl7ZreYvvtUso7fKevpsI+pYVVwnu82YO0q3V6eg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+	<!-- <script>
+		// Set the worker source for PDF.js library
+		
+		// Function to handle the post-processing after text extraction
+		function afterProcess() {
+// 			$.ajax({
+//   				type: "POST",
+//   				url: "~/main.py",
+//   				data: { param: text}
+// 			}).done(function( o ) {
+//    // do something
+// 		});
+// 			// pdftext.value = alltext; // Display the extracted text for the selected page
+// 			download.href = "data:text/plain;charset=utf-8," + encodeURIComponent(alltext); // Set the download link URL for the extracted text
+// 			// afterupload.style.display = "flex"; // Display the result section
+// 			// document.querySelector(".another").style.display = "unset"; // Display the "Extract Another PDF" button
+		}
+	</script> -->
+	<script>/**
+		* Returns the current datetime for the message creation.
+		*/
+	   function getCurrentTimestamp() {
+		   return new Date();
+	   }
+	   
+	   /**
+		* Renders a message on the chat screen based on the given arguments.
+		* This is called from the `showUserMessage` and `showBotMessage`.
+		*/
+	   function renderMessageToScreen(args) {
+		   // local variables
+		   let displayDate = (args.time || getCurrentTimestamp()).toLocaleString('en-IN', {
+			   month: 'short',
+			   day: 'numeric',
+			   hour: 'numeric',
+			   minute: 'numeric',
+		   });
+		   let messagesContainer = $('.messages');
+	   
+		   // init element
+		   let message = $(`
+		   <li class="message ${args.message_side}">
+			   <div class="avatar"></div>
+			   <div class="text_wrapper">
+				   <div class="text">${args.text}</div>
+				   <div class="timestamp">${displayDate}</div>
+			   </div>
+		   </li>
+		   `);
+	   
+		   // add to parent
+		   messagesContainer.append(message);
+	   
+		   // animations
+		   setTimeout(function () {
+			   message.addClass('appeared');
+		   }, 0);
+		   messagesContainer.animate({ scrollTop: messagesContainer.prop('scrollHeight') }, 300);
+	   }
+	   
+	   /* Sends a message when the 'Enter' key is pressed.
+		*/
+	   $(document).ready(function() {
+		   $('#msg_input').keydown(function(e) {
+			   // Check for 'Enter' key
+			   if (e.key === 'Enter') {
+				   // Prevent default behaviour of enter key
+				   e.preventDefault();
+				   // Trigger send button click event
+				   $('#send_button').click();
+			   }
+		   });
+	   });
+	   
+	   /**
+		* Displays the user message on the chat screen. This is the right side message.
+		*/
+	   function showUserMessage(message, datetime) {
+		   renderMessageToScreen({
+			   text: message,
+			   time: datetime,
+			   message_side: 'right',
+		   });
+	   }
+	   
+	   /**
+		* Displays the chatbot message on the chat screen. This is the left side message.
+		*/
+	   function showBotMessage(message, datetime) {
+		   renderMessageToScreen({
+			   text: message,
+			   time: datetime,
+			   message_side: 'left',
+		   });
+	   }
+	   
+	   /**
+		* Get input from user and show it on screen on button click.
+		*/
+	   $('#send_button').on('click', function (e) {
+		   // get and show message and reset input
+		   showUserMessage($('#msg_input').val());
+		   $('#msg_input').val('');
+	   
+		   // show bot message
+		   setTimeout(function () {
+			   showBotMessage("Oh!Great. Could you provide some of his writings/blogs/interviews");
+		   }, 300);
+	   });
+	   
+	   
+	   
+	   /**
+		* Set initial bot message to the screen for the user.
+		*/
+	   $(window).on('load', function () {
+		   showBotMessage('Hello there! ');
+		   showBotMessage('Allow me to introduce myself, I am an imitation chatbot that speaks just like your favorite public personality.Who would you like me to imitate? Type the name of a public personality ')
+	   });</script>
+	<py-script>
+	import asyncio
+	import js
+	from js import document, FileReader, showBotMessage
+	from pyodide.ffi import create_proxy
+	from js import document, window, Uint8Array
+	from pyodide.ffi.wrappers import add_event_listener
+	import csv
+	async def get_bytes_from_file(file):
+		array_buf = await file.arrayBuffer()
+		return array_buf.to_bytes()
+
+		
+	async def process_file(x):
+		fileList = document.getElementById('upload').files
+		
+		first_item = fileList.item(0)
+		
+		
+		my_bytes: bytes = await get_bytes_from_file(first_item)
+		print(type(my_bytes)) # Do something with file contents
+		my=str(my_bytes)
+		entries=my.split("\\n")
+		entries.insert(0, 'text')
+		
+		output_file="shakespeare.csv"
+		with open(output_file, 'w', newline='', encoding='utf-8') as csv_file:
+			
+			csv_writer = csv.writer(csv_file)
+			csv_writer.writerows([entry] for entry in entries)
+		
+		with open(output_file, 'r') as f:
+			showBotMessage(entries)
+	
+		return
+		
+	def main():
+		# Create a Python proxy for the callback function
+		file_event = create_proxy(process_file)
+		
+		# Set the listener to the callback
+		e = document.getElementById("upload")
+		e.addEventListener("change", file_event, False)
+		
+	main()
+			
+	
+	  </py-script>
+	  
+	<!-- custom scripts -->
+	
+</body>
+
+</html>
