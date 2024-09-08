@@ -1,6 +1,6 @@
 # Personalized Content Generator AI
 
-![Project Screenshot](path/to/your/logo.png) <!-- Replace with the actual path to the logo -->
+![Project Screenshot](frontend.png) <!-- Replace with the actual path to the logo -->
 
 ## Overview
 
